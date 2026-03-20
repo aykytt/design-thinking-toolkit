@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6-3-5 Brainwriting</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Light grayscale — all AAA */
+  --bg:        #F5F5F5;   /* page bg */
+  --card:      #EBEBEB;   /* card surface */
+  --card2:     #E0E0E0;   /* deeper surface */
+  --border:    #D0D0D0;   /* subtle divider */
+  --border2:   #B8B8B8;   /* medium border */
+  --text:      #0A0A0A;   /* 18.2:1 on bg — AAA */
+  --text2:     #333333;   /* 11.6:1 — AAA */
+  --text3:     #555555;   /* 6.8:1  — AAA */
+  --white:     #FFFFFF;
+  --black:     #0A0A0A;
+  --font: Arial, Helvetica, sans-serif;
+  --r: 10px;
+  --r-lg: 16px;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 20px 60px;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 640px;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeUp 0.3s ease;
+}
+.screen.active { display: flex; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── SHARED ELEMENTS ────────────────────────────────── */
+
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  background: var(--card2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+
+h1 {
+  font-size: clamp(32px, 6vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.0;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text3);
+  line-height: 1.6;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+}
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
+.field label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.field input, .field textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  resize: none;
+}
+
+.field input:focus, .field textarea:focus { border-color: var(--text2); }
+.field input::placeholder, .field textarea::placeholder { color: var(--text3); opacity: 0.7; }
+.field input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.selector-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.sel-btn {
+  padding: 10px 16px;
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  min-width: 48px;
+  text-align: center;
+}
+
+.sel-btn:hover { border-color: var(--border2); color: var(--text); }
+.sel-btn.active {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--white);
+}
+
+.btn-primary {
+  background: var(--text);
+  color: var(--white);
+  border: none;
+  border-radius: var(--r);
+  padding: 16px 28px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  width: 100%;
+  letter-spacing: 0.01em;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 20px;
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-secondary:hover { border-color: var(--border2); color: var(--text); }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── SETUP ─────────────────────────────────────────── */
+
+.setup-top { text-align: center; padding: 8px 0 28px; }
+
+.formula-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.f-chip {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 16px;
+  text-align: center;
+  min-width: 72px;
+}
+.f-chip .fn {
+  display: block;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.f-chip .fl {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 3px;
+}
+.f-sep { font-size: 18px; color: var(--border2); }
+
+.setup-form { display: flex; flex-direction: column; gap: 20px; }
+
+.calc-summary {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.calc-item { text-align: center; }
+.calc-item .cv {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.calc-item .cl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 3px;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.input-row .field { flex: 1; }
+
+/* ── INSTRUCTIONS ──────────────────────────────────── */
+
+.instr-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+.topic-pill {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text);
+  border-radius: var(--r);
+  padding: 12px 16px;
+}
+.topic-pill .tp-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+.topic-pill .tp-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.step-list { display: flex; flex-direction: column; gap: 2px; }
+
+.step-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+}
+
+.step-n {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text3);
+  background: var(--card);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-txt {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.step-txt strong { font-weight: 700; color: var(--text); }
+
+.instr-btns { display: flex; gap: 10px; }
+
+/* ── TIMER ─────────────────────────────────────────── */
+
+.timer-wrap { display: flex; flex-direction: column; gap: 14px; }
+
+.timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.round-tag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+.dots-row { display: flex; gap: 6px; align-items: center; }
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.25s;
+}
+.dot.done { background: var(--text2); }
+.dot.active { background: var(--text); transform: scale(1.3); }
+
+/* Ring timer */
+.ring-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 8px 0;
+}
+
+.ring-outer {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.ring-outer svg { transform: rotate(-90deg); position: absolute; top:0; left:0; }
+.ring-bg { fill: none; stroke: var(--card2); stroke-width: 7; }
+.ring-fg {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s;
+}
+.ring-fg.warn  { stroke: #555555; }
+.ring-fg.crit  { stroke: #0A0A0A; stroke-width: 9; }
+
+.ring-inner {
+  position: absolute;
+  top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+}
+.ring-time {
+  display: block;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1;
+}
+.ring-sub {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-top: 3px;
+}
+
+/* Topic strip */
+.topic-strip {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.ts-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.ts-val { font-size: 13px; color: var(--text); font-weight: 500; }
+
+/* Idea inputs */
+.ideas-block { display: flex; flex-direction: column; gap: 6px; }
+.ideas-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 2px;
+}
+.idea-row { display: flex; gap: 8px; align-items: flex-start; }
+.idea-num {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text3);
+  width: 18px;
+  margin-top: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.idea-input {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color 0.15s;
+  resize: none;
+  min-height: 46px;
+}
+.idea-input:focus { border-color: var(--text2); }
+.idea-input::placeholder { color: var(--text3); opacity: 0.6; }
+
+/* Controls */
+.timer-ctrls { display: flex; gap: 8px; }
+
+.btn-pause {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font-size: 16px;
+  width: 50px;
+  cursor: pointer;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.btn-pause:hover { border-color: var(--border2); }
+
+.btn-ready {
+  flex: 1;
+  background: var(--white);
+  border: 1.5px solid var(--text2);
+  border-radius: var(--r);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-ready:hover { background: var(--card); }
+.btn-ready.all-ready { background: var(--text); color: var(--white); border-color: var(--text); }
+
+.ready-info {
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+}
+
+.pause-banner {
+  display: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: center;
+}
+.pause-banner.on { display: block; }
+
+/* ── TRANSITION ────────────────────────────────────── */
+
+.trans-wrap { display: flex; flex-direction: column; gap: 18px; text-align: center; padding: 12px 0; }
+.trans-title { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+.trans-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 22px; }
+
+.trans-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.trans-step:last-child { border-bottom: none; }
+.trans-ico { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.trans-txt { font-size: 14px; line-height: 1.55; color: var(--text2); }
+.trans-txt strong { color: var(--text); }
+
+/* ── FINAL ─────────────────────────────────────────── */
+
+.final-wrap { display: flex; flex-direction: column; gap: 22px; }
+
+.final-header { text-align: center; padding-top: 8px; }
+.final-title { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 6px; }
+
+.stats-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.stat-box {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 20px;
+  text-align: center;
+  min-width: 80px;
+}
+.stat-box .sv { display: block; font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-box .sl { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-top: 3px; }
+
+/* Ideas export */
+.ideas-export { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+
+.export-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.export-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.btn-copy {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-copy:hover { background: var(--card2); }
+
+.round-block { border-bottom: 1px solid var(--border); }
+.round-block:last-child { border-bottom: none; }
+.round-head {
+  padding: 10px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  background: var(--bg);
+}
+.idea-entry {
+  display: flex;
+  gap: 10px;
+  padding: 8px 18px;
+  border-top: 1px solid var(--border);
+  align-items: flex-start;
+}
+.ie-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  flex-shrink: 0;
+  width: 18px;
+  margin-top: 2px;
+}
+.ie-text { font-size: 14px; color: var(--text); line-height: 1.4; }
+.ie-empty { font-size: 13px; color: var(--text3); font-style: italic; padding: 8px 18px 8px 46px; border-top: 1px solid var(--border); }
+
+.next-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px; }
+.next-block h3 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.next-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+.next-item:last-child { border-bottom: none; }
+.ni-arrow { font-size: 13px; font-weight: 700; color: var(--text3); flex-shrink: 0; margin-top: 2px; }
+.ni-txt { font-size: 13px; line-height: 1.5; color: var(--text2); }
+.ni-txt strong { color: var(--text); }
+
+@keyframes flash { 0%,100%{background:#F5F5F5} 30%,70%{background:#D8D8D8} }
+body.flash { animation: flash 0.5s ease; }
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1 — SETUP ══════════════════════════════ -->
+<div class="screen active" id="s-setup">
+  <div class="setup-top">
+    <div class="tag">Design Thinking · Ideation</div>
+    <h1>6-3-5<br>Brainwriting</h1>
+    <p class="subtitle">Silent parallel ideation. Everyone writes, no one dominates.</p>
+    <div class="formula-row">
+      <div class="f-chip"><span class="fn" id="f-p">6</span><span class="fl">People</span></div>
+      <span class="f-sep">×</span>
+      <div class="f-chip"><span class="fn">3</span><span class="fl">Ideas</span></div>
+      <span class="f-sep">×</span>
+      <div class="f-chip"><span class="fn" id="f-m">5</span><span class="fl">Min/Round</span></div>
+      <span class="f-sep">=</span>
+      <div class="f-chip"><span class="fn" id="f-tot">108</span><span class="fl">Potential</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="setup-form">
+
+      <div class="field">
+        <label>Workshop Topic / Challenge</label>
+        <textarea id="inp-topic" rows="2" placeholder="e.g. How might we improve the onboarding experience?"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Number of Participants</label>
+        <div class="selector-row" id="sel-people">
+          <button class="sel-btn" data-v="2">2</button>
+          <button class="sel-btn" data-v="3">3</button>
+          <button class="sel-btn" data-v="4">4</button>
+          <button class="sel-btn" data-v="5">5</button>
+          <button class="sel-btn active" data-v="6">6</button>
+          <button class="sel-btn" data-v="7">7</button>
+          <button class="sel-btn" data-v="8">8</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Number of Rounds</label>
+        <div class="selector-row" id="sel-rounds">
+          <button class="sel-btn" data-v="2">2</button>
+          <button class="sel-btn" data-v="3">3</button>
+          <button class="sel-btn" data-v="4">4</button>
+          <button class="sel-btn" data-v="5">5</button>
+          <button class="sel-btn active" data-v="6">6</button>
+          <button class="sel-btn" data-v="7">7</button>
+          <button class="sel-btn" data-v="8">8</button>
+        </div>
+        <span style="font-size:11px;color:var(--text3);margin-top:4px;">Classic: rounds = people. Feel free to adjust.</span>
+      </div>
+
+      <div class="field">
+        <label>Minutes per Round</label>
+        <div class="input-row">
+          <div class="field" style="max-width:120px;">
+            <input type="number" id="inp-dur" value="5" min="1" max="60" placeholder="5">
+          </div>
+          <span style="font-size:13px;color:var(--text3);padding-bottom:12px;">minutes</span>
+        </div>
+      </div>
+
+      <div class="calc-summary">
+        <div class="calc-item"><span class="cv" id="c-rounds">6</span><span class="cl">Rounds</span></div>
+        <div class="calc-item"><span class="cv" id="c-ideas">108</span><span class="cl">Ideas max</span></div>
+        <div class="calc-item"><span class="cv" id="c-time">30</span><span class="cl">Min total</span></div>
+        <div class="calc-item"><span class="cv" id="c-sheets">6</span><span class="cl">Sheets</span></div>
+      </div>
+
+      <button class="btn-primary" id="btn-to-instr">See Instructions →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2 — INSTRUCTIONS ═══════════════════════ -->
+<div class="screen" id="s-instr">
+  <div class="instr-wrap">
+    <div>
+      <div class="tag">How it works</div>
+      <h2>Before you start</h2>
+      <p class="subtitle">Read this together. Everyone needs to understand the rules.</p>
+    </div>
+
+    <div class="topic-pill">
+      <div class="tp-lbl">Today's topic</div>
+      <div class="tp-val" id="instr-topic">—</div>
+    </div>
+
+    <div class="step-list" id="step-list"></div>
+
+    <div class="instr-btns">
+      <button class="btn-secondary" onclick="goTo('s-setup')">← Back</button>
+      <button class="btn-primary" id="btn-go" style="flex:1;">Start Round 1 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3 — TIMER ══════════════════════════════ -->
+<div class="screen" id="s-timer">
+  <div class="timer-wrap">
+
+    <div class="timer-header">
+      <div class="round-tag" id="round-tag">Round 1</div>
+      <div class="dots-row" id="dots"></div>
+    </div>
+
+    <div class="ring-block">
+      <div class="ring-outer">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle class="ring-bg" cx="80" cy="80" r="68"/>
+          <circle class="ring-fg" id="ring" cx="80" cy="80" r="68"
+            stroke-dasharray="427.26" stroke-dashoffset="0"/>
+        </svg>
+        <div class="ring-inner">
+          <span class="ring-time" id="ring-time">5:00</span>
+          <span class="ring-sub">remaining</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="topic-strip">
+      <span class="ts-lbl">Topic</span>
+      <span class="ts-val" id="t-topic">—</span>
+    </div>
+
+    <div class="ideas-block">
+      <div class="ideas-lbl">Your 3 ideas — Round <span id="ideas-round-num">1</span></div>
+      <div class="idea-row">
+        <span class="idea-num">1</span>
+        <textarea class="idea-input" id="i1" placeholder="Write your first idea…" rows="2"></textarea>
+      </div>
+      <div class="idea-row">
+        <span class="idea-num">2</span>
+        <textarea class="idea-input" id="i2" placeholder="Write your second idea…" rows="2"></textarea>
+      </div>
+      <div class="idea-row">
+        <span class="idea-num">3</span>
+        <textarea class="idea-input" id="i3" placeholder="Write your third idea…" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="pause-banner" id="p-banner">⏸ Timer Paused</div>
+    <div class="ready-info" id="ready-info"></div>
+
+    <div class="timer-ctrls">
+      <button class="btn-pause" id="btn-pause" title="Pause">⏸</button>
+      <button class="btn-ready" id="btn-ready">✓ I'm Ready</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SCREEN 4 — TRANSITION ════════════════════════ -->
+<div class="screen" id="s-trans">
+  <div class="trans-wrap">
+    <div>
+      <div class="tag">Round complete</div>
+      <div class="trans-title" id="trans-title">Round 1 done</div>
+    </div>
+    <div class="trans-card">
+      <div class="trans-step">
+        <span class="trans-ico">↙</span>
+        <div class="trans-txt"><strong>Pass your sheet to the left.</strong> The next person reads your ideas and builds on them.</div>
+      </div>
+      <div class="trans-step">
+        <span class="trans-ico">👀</span>
+        <div class="trans-txt"><strong>Read the ideas on your new sheet.</strong> Absorb — don't judge yet.</div>
+      </div>
+      <div class="trans-step">
+        <span class="trans-ico">✏️</span>
+        <div class="trans-txt"><strong>Add 3 new ideas.</strong> Extend, combine, or completely diverge. Anything goes.</div>
+      </div>
+    </div>
+    <button class="btn-primary" id="btn-next">Start Round <span id="next-n">2</span> →</button>
+    <button class="btn-secondary" onclick="goTo('s-timer')">← Go back</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 5 — FINAL ══════════════════════════════ -->
+<div class="screen" id="s-final">
+  <div class="final-wrap">
+
+    <div class="final-header">
+      <div class="tag">Session Complete</div>
+      <div class="final-title">All rounds done.</div>
+      <p class="subtitle">Here's everything you created.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box"><span class="sv" id="st-r">—</span><span class="sl">Rounds</span></div>
+      <div class="stat-box"><span class="sv" id="st-i">—</span><span class="sl">Ideas written</span></div>
+      <div class="stat-box"><span class="sv" id="st-p">—</span><span class="sl">People</span></div>
+      <div class="stat-box"><span class="sv" id="st-t">—</span><span class="sl">Minutes</span></div>
+    </div>
+
+    <div class="ideas-export">
+      <div class="export-header">
+        <span class="export-title">All ideas from this session</span>
+        <button class="btn-copy" id="btn-copy">Copy all</button>
+      </div>
+      <div id="ideas-out"></div>
+    </div>
+
+    <div class="next-block">
+      <h3>What to do now</h3>
+      <div class="next-item"><span class="ni-arrow">→</span><div class="ni-txt"><strong>Collect all sheets.</strong> Spread them so everyone can see all ideas at once.</div></div>
+      <div class="next-item"><span class="ni-arrow">→</span><div class="ni-txt"><strong>Silent read-through.</strong> 5 minutes, no talking — just absorb.</div></div>
+      <div class="next-item"><span class="ni-arrow">→</span><div class="ni-txt"><strong>KJ Technique.</strong> Write each idea on a sticky, cluster by theme.</div></div>
+      <div class="next-item"><span class="ni-arrow">→</span><div class="ni-txt"><strong>Dot Voting.</strong> 2 votes each — pick your favourite clusters.</div></div>
+    </div>
+
+    <button class="btn-secondary" onclick="restartApp()">↺ Start New Session</button>
+
+  </div>
+</div>
+
+<script>
+const S = {
+  people: 6, rounds: 6, dur: 5,
+  topic: '', cur: 1,
+  secs: 300, maxSecs: 300,
+  interval: null, paused: false,
+  readyN: 0,
+  ideas: {} // { round: [i1, i2, i3] }
+};
+
+const CIRC = 2 * Math.PI * 68; // r=68
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+function fmt(s) { return `${Math.floor(s/60)}:${pad(s%60)}`; }
+
+function updateCalc() {
+  const d = parseInt(document.getElementById('inp-dur').value) || 5;
+  S.dur = d;
+  document.getElementById('c-rounds').textContent = S.rounds;
+  document.getElementById('c-ideas').textContent  = S.people * 3 * S.rounds;
+  document.getElementById('c-time').textContent   = S.rounds * d;
+  document.getElementById('c-sheets').textContent = S.people;
+  document.getElementById('f-p').textContent = S.people;
+  document.getElementById('f-m').textContent = d;
+  document.getElementById('f-tot').textContent = S.people * 3 * S.rounds;
+}
+
+// Selectors
+function bindSelector(containerId, stateKey, cb) {
+  document.getElementById(containerId).querySelectorAll('.sel-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(containerId).querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      S[stateKey] = parseInt(btn.dataset.v);
+      if (cb) cb();
+      updateCalc();
+    });
+  });
+}
+
+bindSelector('sel-people', 'people');
+bindSelector('sel-rounds', 'rounds');
+document.getElementById('inp-dur').addEventListener('input', updateCalc);
+
+// Setup → Instructions
+document.getElementById('btn-to-instr').addEventListener('click', () => {
+  const topic = document.getElementById('inp-topic').value.trim();
+  if (!topic) {
+    const el = document.getElementById('inp-topic');
+    el.style.borderColor = '#0A0A0A';
+    el.focus();
+    setTimeout(() => el.style.borderColor = '', 1500);
+    return;
+  }
+  S.topic = topic;
+  S.dur = parseInt(document.getElementById('inp-dur').value) || 5;
+  buildInstructions();
+  goTo('s-instr');
+});
+
+function buildInstructions() {
+  document.getElementById('instr-topic').textContent = S.topic;
+  const steps = [
+    `Each person gets <strong>${S.people} sheet${S.people>1?'s':''}</strong> of paper. Write the topic at the top of each sheet.`,
+    `You have <strong>${S.dur} minute${S.dur>1?'s':''}</strong> per round to write <strong>3 ideas</strong>. Work in complete silence.`,
+    `When the round ends, <strong>pass your sheet to the left.</strong> Read the ideas and build on them.`,
+    `Repeat for <strong>${S.rounds} rounds</strong>. Each round you receive a different sheet with new ideas to inspire you.`,
+    `At the end: collect all sheets, read silently, then use <strong>KJ Technique</strong> to cluster your ideas.`,
+  ];
+  document.getElementById('step-list').innerHTML = steps.map((t,i) =>
+    `<div class="step-row"><div class="step-n">0${i+1}</div><div class="step-txt">${t}</div></div>`
+  ).join('');
+}
+
+document.getElementById('btn-go').addEventListener('click', () => startRound(1));
+
+// ── TIMER ──────────────────────────────────────────────────────────────────
+
+function startRound(n) {
+  S.cur = n;
+  S.secs = S.dur * 60;
+  S.maxSecs = S.dur * 60;
+  S.paused = false;
+  S.readyN = 0;
+  clearInterval(S.interval);
+
+  ['i1','i2','i3'].forEach(id => document.getElementById(id).value = '');
+
+  document.getElementById('round-tag').textContent = `Round ${n} of ${S.rounds}`;
+  document.getElementById('ideas-round-num').textContent = n;
+  document.getElementById('t-topic').textContent = S.topic;
+  document.getElementById('btn-pause').textContent = '⏸';
+  document.getElementById('p-banner').classList.remove('on');
+
+  buildDots();
+  updateReadyUI();
+  tickDisplay();
+  goTo('s-timer');
+
+  S.interval = setInterval(() => {
+    if (S.paused) return;
+    S.secs--;
+    tickDisplay();
+    if (S.secs <= 0) {
+      clearInterval(S.interval);
+      saveIdeas();
+      document.body.classList.add('flash');
+      setTimeout(() => document.body.classList.remove('flash'), 600);
+      setTimeout(showTrans, 700);
+    }
+  }, 1000);
+}
+
+function tickDisplay() {
+  document.getElementById('ring-time').textContent = fmt(S.secs);
+  const offset = CIRC * (1 - S.secs / S.maxSecs);
+  const ring = document.getElementById('ring');
+  ring.style.strokeDashoffset = offset;
+  ring.className = 'ring-fg';
+  if (S.secs <= 30) ring.classList.add('crit');
+  else if (S.secs <= S.maxSecs * 0.25) ring.classList.add('warn');
+}
+
+function buildDots() {
+  const c = document.getElementById('dots');
+  c.innerHTML = '';
+  for (let i = 1; i <= S.rounds; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < S.cur ? ' done' : i === S.cur ? ' active' : '');
+    c.appendChild(d);
+  }
+}
+
+// Pause
+document.getElementById('btn-pause').addEventListener('click', () => {
+  S.paused = !S.paused;
+  document.getElementById('btn-pause').textContent = S.paused ? '▶' : '⏸';
+  document.getElementById('p-banner').classList.toggle('on', S.paused);
+});
+
+// Ready
+document.getElementById('btn-ready').addEventListener('click', () => {
+  if (S.readyN < S.people) S.readyN++;
+  updateReadyUI();
+  if (S.readyN >= S.people) {
+    clearInterval(S.interval);
+    saveIdeas();
+    showTrans();
+  }
+});
+
+function updateReadyUI() {
+  const info = document.getElementById('ready-info');
+  const btn  = document.getElementById('btn-ready');
+  if (S.people === 1) {
+    info.textContent = '';
+    btn.textContent = '✓ Done — Next Round';
+    btn.classList.remove('all-ready');
+  } else {
+    info.textContent = S.readyN > 0 ? `${S.readyN} of ${S.people} ready` : 'Tap when you\'ve written all 3 ideas';
+    btn.textContent = S.readyN > 0 ? `✓ Ready (${S.readyN}/${S.people})` : '✓ I\'m Ready';
+    btn.classList.toggle('all-ready', S.readyN >= S.people);
+  }
+}
+
+function saveIdeas() {
+  S.ideas[S.cur] = [
+    document.getElementById('i1').value.trim(),
+    document.getElementById('i2').value.trim(),
+    document.getElementById('i3').value.trim(),
+  ];
+}
+
+// ── TRANSITION ─────────────────────────────────────────────────────────────
+
+function showTrans() {
+  if (S.cur >= S.rounds) { showFinal(); return; }
+  document.getElementById('trans-title').textContent = `Round ${S.cur} complete`;
+  document.getElementById('next-n').textContent = S.cur + 1;
+  goTo('s-trans');
+}
+
+document.getElementById('btn-next').addEventListener('click', () => startRound(S.cur + 1));
+
+// ── FINAL ───────────────────────────────────────────────────────────────────
+
+function showFinal() {
+  // Stats
+  const written = Object.values(S.ideas).flat().filter(Boolean).length;
+  document.getElementById('st-r').textContent = S.rounds;
+  document.getElementById('st-i').textContent = written;
+  document.getElementById('st-p').textContent = S.people;
+  document.getElementById('st-t').textContent = S.rounds * S.dur;
+
+  // Ideas output
+  const out = document.getElementById('ideas-out');
+  out.innerHTML = '';
+  for (let r = 1; r <= S.rounds; r++) {
+    const ideas = S.ideas[r] || ['','',''];
+    const block = document.createElement('div');
+    block.className = 'round-block';
+    let html = `<div class="round-head">Round ${r}</div>`;
+    ideas.forEach((idea, i) => {
+      if (idea) {
+        html += `<div class="idea-entry"><span class="ie-num">${i+1}</span><span class="ie-text">${escHtml(idea)}</span></div>`;
+      } else {
+        html += `<div class="ie-empty">Idea ${i+1} — not filled in</div>`;
+      }
+    });
+    block.innerHTML = html;
+    out.appendChild(block);
+  }
+
+  goTo('s-final');
+}
+
+// Copy all ideas
+document.getElementById('btn-copy').addEventListener('click', () => {
+  let text = `6-3-5 Brainwriting — ${S.topic}\n\n`;
+  for (let r = 1; r <= S.rounds; r++) {
+    const ideas = S.ideas[r] || ['','',''];
+    text += `ROUND ${r}\n`;
+    ideas.forEach((idea, i) => {
+      text += `  ${i+1}. ${idea || '(empty)'}\n`;
+    });
+    text += '\n';
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy all', 2000);
+  });
+});
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function restartApp() {
+  clearInterval(S.interval);
+  Object.assign(S, { people:6, rounds:6, dur:5, topic:'', cur:1,
+    secs:300, maxSecs:300, interval:null, paused:false, readyN:0, ideas:{} });
+  document.getElementById('inp-topic').value = '';
+  document.getElementById('inp-dur').value = '5';
+  document.querySelectorAll('#sel-people .sel-btn').forEach(b => b.classList.toggle('active', b.dataset.v==='6'));
+  document.querySelectorAll('#sel-rounds .sel-btn').forEach(b => b.classList.toggle('active', b.dataset.v==='6'));
+  updateCalc();
+  goTo('s-setup');
+}
+
+updateCalc();
+</script>
+</body>
+</html>
