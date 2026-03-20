@@ -259,10 +259,6 @@ section+section{border-top:1px solid var(--border);}
 </section>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ── CARD CONFIG ─────────────────────────────────────
-// fill: filename of the digital fill HTML, or null if not ready yet.
-// To activate a card: add fill:"filename.html" and push to GitHub.
-// No other changes needed in this file.
 var CARDS=[
   {title:"Empathy Map",        phase:"empathy",    desc:"Map what your user sees, hears, says and does before defining any problem.",              fill:"empathy_map_fill.html"},
   {title:"Persona",            phase:"empathy",    desc:"Build a realistic representation of your key user segment to guide design decisions.",    fill:null},
@@ -274,9 +270,9 @@ var CARDS=[
   {title:"MoSCoW",             phase:"empathy",    desc:"Prioritise requirements by forcing consensus on what must, should, could and will not.",  fill:null},
   {title:"Love / Break-up",    phase:"empathy",    desc:"Write to a product as a person to surface emotional highs and frustrations clearly.",     fill:null},
   {title:"Brainstorming",      phase:"ideation",   desc:"Generate as many raw ideas as possible in a fixed time. Quantity over quality.",          fill:null},
-  {title:"6-3-5 Brainwriting", phase:"ideation",   desc:"Silent parallel ideation. Build on each other's ideas without groupthink.",              fill:null},
+  {title:"6-3-5 Brainwriting", phase:"ideation",   desc:"Silent parallel ideation. Build on each other ideas without groupthink.",                 fill:null},
   {title:"Dark Side",          phase:"ideation",   desc:"Invert each idea to reveal its worst outcome, then flip back to find opportunities.",     fill:null},
-  {title:"Tomorrow's Headlines",phase:"ideation",desc:"Write a future headline about your solution to force a bold, user-centred vision.",       fill:null},
+  {title:"Tomorrows Headlines",phase:"ideation",   desc:"Write a future headline about your solution to force a bold user-centred vision.",        fill:null},
   {title:"KJ Technique",       phase:"ideation",   desc:"Cluster observations into affinity groups to reveal patterns and themes.",                fill:null},
   {title:"Lotus Blossom",      phase:"ideation",   desc:"Expand a central theme into 8 sub-themes, each opening its own 3x3.",                    fill:null},
   {title:"Morphological Chart",phase:"ideation",   desc:"Combine options across parameters systematically to create novel solutions.",             fill:null},
@@ -291,42 +287,29 @@ function buildCards(filter){
     var el=document.createElement('div');
     el.className='card-item';
     var ph=c.phase.charAt(0).toUpperCase()+c.phase.slice(1);
+    var fillBtn=c.fill
+      ? '<button class="ci-fill" onclick="window.open(\''+c.fill+'\',\'_blank\')">Fill online &#8594;</button>'
+      : '<button class="ci-fill" style="color:#999;cursor:default;">Coming soon</button>';
     el.innerHTML='<div class="ci-phase '+c.phase+'">'+ph+'</div>'
       +'<div class="ci-title">'+c.title+'</div>'
       +'<div class="ci-desc">'+c.desc+'</div>'
       +'<div class="ci-lines"><div class="ci-line"></div><div class="ci-line"></div><div class="ci-line"></div></div>'
-      +'<button class="ci-fill" onclick="fillCard(this,''+( c.fill||'' )+'')">'+(c.fill ? 'Fill online &rarr;' : 'Coming soon')+'</button>';
+      +fillBtn;
     grid.appendChild(el);
   });
 }
 
 function filterCards(btn,filter){
-  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active');
+  document.querySelectorAll(".filter-btn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
   buildCards(filter);
 }
 
-function fillCard(btn){
-  btn.textContent='Coming soon';
-  btn.style.color='var(this,'--');}
-
-function fillCard(btn,file){
-  if(file){
-    window.open(file,'_blank');
-  } else {
-    var orig=btn.textContent;
-    btn.textContent='Coming soon';
-    btn.style.color='var(--text3)';
-    btn.disabled=true;
-    setTimeout(function(){btn.textContent=orig;btn.style.color='';btn.disabled=false;},1800);
-  }
-}
-
 function goTo(id){
-  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  document.getElementById(id).scrollIntoView({behavior:"smooth"});
 }
 
-buildCards('all');
+buildCards("all");
 </script>
 </body>
 </html>
