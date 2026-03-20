@@ -308,4 +308,25 @@ function filterCards(btn,filter){
 
 function fillCard(btn){
   btn.textContent='Coming soon';
-  btn.style.color='var
+  btn.style.color='var(this,'--');}
+
+function fillCard(btn,file){
+  if(file){
+    window.open(file,'_blank');
+  } else {
+    var orig=btn.textContent;
+    btn.textContent='Coming soon';
+    btn.style.color='var(--text3)';
+    btn.disabled=true;
+    setTimeout(function(){btn.textContent=orig;btn.style.color='';btn.disabled=false;},1800);
+  }
+}
+
+function goTo(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+buildCards('all');
+</script>
+</body>
+</html>
